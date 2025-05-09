@@ -24,16 +24,17 @@ export function petrophysicsAgentBuilder(scope: Construct, props: AgentProps) {
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
     const stackName = cdk.Stack.of(scope).stackName;
     const stackUUID = cdk.Names.uniqueResourceName(scope, { maxLength: 3 }).toLowerCase().replace(/[^a-z0-9-_]/g, '').slice(-3);
+
+    const rootStack = cdk.Stack.of(scope).nestedStackParent
+    if (!rootStack) throw new Error('Root stack not found')
+
     // list of models can be found here https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html
-    const foundationModel = 'anthropic.claude-3-haiku-20240307-v1:0';
+    const foundationModel = 'arn:aws:bedrock:${rootStack.region}:${rootStack.account}:inference-profile/apac.anthropic.claude-3-5-sonnet-20241022-v2:0';
     const agentName = `A4E-Petrophysics-${stackUUID}`;
     const agentRoleName = `AmazonBedrockExecutionRole_A4E_Petrophysics-${stackUUID}`;
     const agentDescription = 'Agent for energy industry subsurface workflows';
 
     console.log("Petrophysics Stack UUID: ", stackUUID)
-
-    const rootStack = cdk.Stack.of(scope).nestedStackParent
-    if (!rootStack) throw new Error('Root stack not found')
 
     // Agent-specific tags
     const agentTags = {
@@ -52,7 +53,7 @@ export function petrophysicsAgentBuilder(scope: Construct, props: AgentProps) {
     // ===== KNOWLEDGE BASE =====
     // Bedrock KB with OpenSearchServerless (OSS) vector backend
     const knowledgeBase = new cdkLabsBedrock.KnowledgeBase(scope, `PetrophysicsKB`, {
-        embeddingsModel: cdkLabsBedrock.BedrockFoundationModel.TITAN_EMBED_TEXT_V2_1024,
+        embeddingsModel: cdkLabsBedrock.BedrockFoundationModel.COHERE_EMBED_MULTILINGUAL_V3,
         instruction: `You are a helpful question answering assistant. When asked to perform a mathematical calculation use the relationship and equations that are available in the knowledgebase.`,
         description: 'The knowledge base contains published scientific literature on seismic petrophysics and rock physics',
     });

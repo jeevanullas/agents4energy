@@ -28,7 +28,11 @@ export function maintenanceAgentBuilder(scope: Construct, props: AgentProps) {
     const stackName = cdk.Stack.of(scope).stackName;
     const stackUUID = cdk.Names.uniqueResourceName(scope, { maxLength: 3 }).toLowerCase().replace(/[^a-z0-9-_]/g, '').slice(-3);
     const defaultDatabaseName = 'maintdb';
-    const foundationModel = 'anthropic.claude-3-sonnet-20240229-v1:0';
+
+    const rootStack = cdk.Stack.of(scope).nestedStackParent
+    if (!rootStack) throw new Error('Root stack not found')
+        
+    const foundationModel = 'arn:aws:bedrock:${rootStack.region}:${rootStack.account}:inference-profile/apac.anthropic.claude-3-5-sonnet-20241022-v2:0';
     // const foundationModel = 'anthropic.claude-3-5-sonnet-20241022-v2:0';
     const agentName = `A4E-Maintenance-${stackUUID}`;
     const agentRoleName = `AmazonBedrockExecutionRole_A4E_Maintenance-${stackUUID}`;
@@ -38,9 +42,6 @@ export function maintenanceAgentBuilder(scope: Construct, props: AgentProps) {
     const maxLength = 4096;
 
     console.log("Maintenance Stack UUID: ", stackUUID)
-
-    const rootStack = cdk.Stack.of(scope).nestedStackParent
-    if (!rootStack) throw new Error('Root stack not found')
 
     // Agent-specific tags
     const maintTags = {
@@ -138,7 +139,7 @@ export function maintenanceAgentBuilder(scope: Construct, props: AgentProps) {
     // ===== MAINTENANCE KNOWLEDGE BASE =====
     // Bedrock KB with OpenSearchServerless (OSS) vector backend
     const maintenanceKnowledgeBase = new cdkLabsBedrock.KnowledgeBase(scope, `KB-Maintenance`, {//${stackName.slice(-5)}
-        embeddingsModel: cdkLabsBedrock.BedrockFoundationModel.TITAN_EMBED_TEXT_V2_1024,
+        embeddingsModel: cdkLabsBedrock.BedrockFoundationModel.COHERE_EMBED_MULTILINGUAL_V3,
         // name: knowledgeBaseName, //Note: The knowledge base name will contain the id of this construct "MaintKB" even without this key being set
         instruction: `You are a helpful question answering assistant. You answer user questions factually and honestly related to industrial facility maintenance and operations`,
         description: 'Maintenance Knowledge Base',
@@ -339,7 +340,12 @@ export function maintenanceAgentBuilder(scope: Construct, props: AgentProps) {
         //policyName: 'A4E-MaintAgentPolicy', // Custom policy name
         statements: [
             new iam.PolicyStatement({
-                actions: ['bedrock:InvokeModel'],
+                actions: [
+                    'bedrock:InvokeModel',
+                    'bedrock:GetInferenceProfile',
+                    'bedrock:ListInferenceProfiles',
+                    'bedrock:UseInferenceProfile'
+                ],
                 resources: [
                     `arn:aws:bedrock:${rootStack.region}:${rootStack.account}:inference-profile/*`,
                     // "arn:aws:bedrock:${rootStack.region}::foundation-model/amazon.nova-lite-v1:0",
@@ -348,6 +354,7 @@ export function maintenanceAgentBuilder(scope: Construct, props: AgentProps) {
                     // "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-micro-v1:0",
                     // "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-pro-v1:0",
                     `arn:aws:bedrock:us-*::foundation-model/*`,
+                    `arn:aws:bedrock:ap-southeast-1::foundation-model/*`,
                 ]
             }),
             new iam.PolicyStatement({

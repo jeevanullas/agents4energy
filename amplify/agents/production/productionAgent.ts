@@ -64,10 +64,15 @@ export function productionAgentBuilder(scope: Construct, props: ProductionAgentP
             'BedrockInvocationPolicy': new iam.PolicyDocument({
                 statements: [
                     new iam.PolicyStatement({
-                        actions: ["bedrock:InvokeModel*"],
+                        actions: [
+                            "bedrock:InvokeModel*",
+                            "bedrock:GetInferenceProfile",
+                            "bedrock:ListInferenceProfiles",
+                            "bedrock:UseInferenceProfile"
+                        ],
                         resources: [
                             `arn:aws:bedrock:${rootStack.region}:${rootStack.account}:inference-profile/*`,
-                            `arn:aws:bedrock:us-*::foundation-model/*`,
+                            `arn:aws:bedrock:ap-southeast-1::foundation-model/*`,
                         ],
                     }),
                     new iam.PolicyStatement({
@@ -331,7 +336,7 @@ export function productionAgentBuilder(scope: Construct, props: ProductionAgentP
     // })
 
     const petroleumEngineeringKnowledgeBase = new cdkLabsBedrock.KnowledgeBase(scope, `PetroleumKB`, {//${stackName.slice(-5)}
-        embeddingsModel: cdkLabsBedrock.BedrockFoundationModel.TITAN_EMBED_TEXT_V2_1024,
+        embeddingsModel: cdkLabsBedrock.BedrockFoundationModel.COHERE_EMBED_MULTILINGUAL_V3,
         instruction: `You are a helpful question answering assistant. You answer
         user questions factually and honestly related to petroleum engineering data`,
         description: 'Petroleum Engineering Knowledge Base',

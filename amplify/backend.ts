@@ -79,6 +79,7 @@ bedrockRuntimeDataSource.grantPrincipal.addToPrincipalPolicy(
   new iam.PolicyStatement({
     resources: [
       `arn:aws:bedrock:${backend.auth.stack.region}::foundation-model/anthropic.claude-3-sonnet-20240229-v1:0`,
+      `arn:aws:bedrock:${backend.auth.stack.region}::foundation-model/anthropic.claude-3-5-sonnet-20241022-v2:0`,
       `arn:aws:bedrock:${backend.auth.stack.region}::foundation-model/anthropic.*`,
     ],
     actions: ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
@@ -111,7 +112,7 @@ backend.invokeBedrockAgentFunction.resources.lambda.addToRolePolicy(
   new iam.PolicyStatement({
     resources: [
       `arn:aws:bedrock:${backend.auth.stack.region}::foundation-model/*`,
-      `arn:aws:bedrock:us-*::foundation-model/*`,
+      `arn:aws:bedrock:ap-southeast-1::foundation-model/*`,
     ],
     actions: ["bedrock:InvokeModel", "bedrock:InvokeModelWithResponseStream"],
   })
@@ -121,7 +122,7 @@ backend.getStructuredOutputFromLangchainFunction.resources.lambda.addToRolePolic
   new iam.PolicyStatement({
     resources: [
       `arn:aws:bedrock:${backend.auth.stack.region}:${backend.auth.stack.account}:inference-profile/*`,
-      `arn:aws:bedrock:us-*::foundation-model/*`,
+      `arn:aws:bedrock:ap-southeast-1::foundation-model/*`,
     ],
     actions: ["bedrock:InvokeModel"],
   })

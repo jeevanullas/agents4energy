@@ -11,10 +11,15 @@ export const addLlmAgentPolicies = (props: {
 
     props.role.addToPrincipalPolicy(
         new iam.PolicyStatement({
-            actions: ["bedrock:InvokeModel*"],
+            actions: [
+                "bedrock:InvokeModel*",
+                "bedrock:GetInferenceProfile",
+                "bedrock:ListInferenceProfiles",
+                "bedrock:UseInferenceProfile"
+            ],
             resources: [
                 `arn:aws:bedrock:${props.rootStack.region}:${props.rootStack.account}:inference-profile/*`,
-                `arn:aws:bedrock:us-*::foundation-model/*`,
+                `arn:aws:bedrock:ap-southeast-1::foundation-model/*`,
             ],
         })
     )
