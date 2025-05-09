@@ -39,7 +39,7 @@ export function petrophysicsAgentBuilder(scope: Construct, props: AgentProps) {
     // Agent-specific tags
     const agentTags = {
         Agent: 'Petrophysics',
-        Model: foundationModel
+        Model: 'anthropic.claude-3-5-sonnet-20241022-v2:0'
     }
 
     // ===== IAM ROLE =====

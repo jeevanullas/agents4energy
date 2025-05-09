@@ -46,7 +46,7 @@ export function maintenanceAgentBuilder(scope: Construct, props: AgentProps) {
     // Agent-specific tags
     const maintTags = {
         Agent: 'Maintenance',
-        Model: foundationModel
+        Model: 'anthropic.claude-3-5-sonnet-20241022-v2:0'
     }
 
     const bedrockAgentRole = new iam.Role(scope, 'BedrockAgentRole', {
