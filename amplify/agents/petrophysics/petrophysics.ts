@@ -29,7 +29,7 @@ export function petrophysicsAgentBuilder(scope: Construct, props: AgentProps) {
     if (!rootStack) throw new Error('Root stack not found')
 
     // list of models can be found here https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html
-    const foundationModel = 'arn:aws:bedrock:${rootStack.region}:${rootStack.account}:inference-profile/apac.anthropic.claude-3-5-sonnet-20241022-v2:0';
+    const foundationModel = `arn:aws:bedrock:${rootStack.region}:${rootStack.account}:inference-profile/apac.anthropic.claude-3-5-sonnet-20241022-v2:0`;
     const agentName = `A4E-Petrophysics-${stackUUID}`;
     const agentRoleName = `AmazonBedrockExecutionRole_A4E_Petrophysics-${stackUUID}`;
     const agentDescription = 'Agent for energy industry subsurface workflows';

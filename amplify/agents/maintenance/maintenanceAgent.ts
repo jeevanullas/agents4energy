@@ -32,7 +32,7 @@ export function maintenanceAgentBuilder(scope: Construct, props: AgentProps) {
     const rootStack = cdk.Stack.of(scope).nestedStackParent
     if (!rootStack) throw new Error('Root stack not found')
         
-    const foundationModel = 'arn:aws:bedrock:${rootStack.region}:${rootStack.account}:inference-profile/apac.anthropic.claude-3-5-sonnet-20241022-v2:0';
+    const foundationModel = `arn:aws:bedrock:${rootStack.region}:${rootStack.account}:inference-profile/apac.anthropic.claude-3-5-sonnet-20241022-v2:0`;
     // const foundationModel = 'anthropic.claude-3-5-sonnet-20241022-v2:0';
     const agentName = `A4E-Maintenance-${stackUUID}`;
     const agentRoleName = `AmazonBedrockExecutionRole_A4E_Maintenance-${stackUUID}`;
